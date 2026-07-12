@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>UsageWidget</RootNamespace>
+    <AssemblyName>UsageWidget</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>Usage Limit Tracker</AssemblyTitle>
+    <Product>Usage Limit Tracker</Product>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+</Project>

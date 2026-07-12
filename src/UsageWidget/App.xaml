@@ -1,0 +1,20 @@
+<Application x:Class="UsageWidget.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <!-- Dark-theme defaults; ThemeService swaps these at runtime. -->
+        <SolidColorBrush x:Key="CardBg" Color="#F21A1A19"/>
+        <SolidColorBrush x:Key="CardBorder" Color="#1AFFFFFF"/>
+        <SolidColorBrush x:Key="InkPrimary" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="InkSecondary" Color="#C3C2B7"/>
+        <SolidColorBrush x:Key="InkMuted" Color="#898781"/>
+        <SolidColorBrush x:Key="Track" Color="#2C2C2A"/>
+        <SolidColorBrush x:Key="Accent" Color="#D97757"/>
+        <SolidColorBrush x:Key="AccentSoft" Color="#40D97757"/>
+        <LinearGradientBrush x:Key="AccentFade" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#D97757" Offset="0"/>
+            <GradientStop Color="#00D97757" Offset="1"/>
+        </LinearGradientBrush>
+    </Application.Resources>
+</Application>
