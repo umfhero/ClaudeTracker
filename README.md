@@ -1,10 +1,10 @@
-# Usage Limit Tracker
+# Claude Usage Limit Tracker
 
-A Windows-native desktop widget that lives on your desktop like a sticky note — every app
-window sits **on top** of it — showing your live Claude usage limits: how much you've used,
+A Windows-native desktop widget that lives on your desktop like a sticky note, every app
+window sits **on top** of it, showing your live Claude usage limits: how much you've used,
 how much is left, and exactly when each limit resets.
 
-> **Lightweight** — a 191 KB exe, ~63 MB private RAM, ~0% idle CPU, zero third-party
+> **Lightweight** — a 191 KB exe, ~63 MB private RAM, ~0% idle CPU, zero third-party!
 > packages. Total CPU used since launch: under 1 second.
 
 ## Screenshots
@@ -13,7 +13,7 @@ how much is left, and exactly when each limit resets.
 |---|---|
 | ![Dark theme](assets/dark.png) | ![Light theme](assets/light.png) |
 
-## What it shows
+## What it does
 
 One meter per limit on your Claude plan, straight from Anthropic's usage endpoint —
 the same numbers claude.ai displays:
@@ -32,7 +32,7 @@ period at each of those thresholds.
 - Reads Claude Code's local OAuth token from `%USERPROFILE%\.claude\.credentials.json`
   (**read-only** — Claude Code owns the token and refreshes it itself).
 - Polls `https://api.anthropic.com/api/oauth/usage` every 5 minutes (plus once on
-  wake-from-sleep). No scraping, no manual logging.
+  wake-from-sleep). No scraping or manual logging.
 - If anything goes wrong it degrades gracefully: keeps the last data and shows
   `stale` (sign-in expired), `offline` (no network), or a hint if no Claude Code
   sign-in exists on the PC.
