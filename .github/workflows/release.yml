@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish single file exe
+        run: dotnet publish src/UsageWidget/UsageWidget.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o out
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" out/UsageWidget.exe --title "${{ github.ref_name }}" --notes-file .github/release-notes.md
