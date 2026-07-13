@@ -106,7 +106,7 @@ public partial class MainWindow : Window
         });
     }
 
-    private async Task RefreshAsync()
+    private async Task RefreshAsync(bool forceIdea = false)
     {
         if (_refreshing) return;
         _refreshing = true;
@@ -149,7 +149,7 @@ public partial class MainWindow : Window
         {
             _refreshing = false;
         }
-        await UpdateIdeaAsync();
+        await UpdateIdeaAsync(forceIdea);
     }
 
     /// <summary>
@@ -195,7 +195,9 @@ public partial class MainWindow : Window
             }
             else
             {
-                IdeaSection.Visibility = Visibility.Collapsed;
+                // Keep showing today's idea (if we have one) when a manual retry fails.
+                bool hasToday = _settings.LastIdeaDate == today && !string.IsNullOrEmpty(_settings.LastIdeaText);
+                IdeaSection.Visibility = hasToday ? Visibility.Visible : Visibility.Collapsed;
                 ApiErrorText.Visibility = Visibility.Visible;
             }
         }
@@ -270,7 +272,7 @@ public partial class MainWindow : Window
         SettingsService.Save(_settings);
     }
 
-    private async void Refresh_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
+    private async void Refresh_Click(object sender, RoutedEventArgs e) => await RefreshAsync(forceIdea: true);
 
     private void Lock_Click(object sender, RoutedEventArgs e)
     {
