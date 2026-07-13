@@ -124,16 +124,16 @@ public partial class MainWindow : Window
 
                 case FetchStatus.NoCredentials:
                     if (_rows.Count == 0)
-                        ShowEmpty("Claude Code sign-in not found on this PC. Run Claude Code and sign in, then right-click → Refresh now.");
-                    SetStatus(DotError, "no sign-in");
+                        ShowEmpty("Claude Code sign in not found on this PC. Run Claude Code and sign in, then use Refresh now in the right click menu.");
+                    SetStatus(DotError, "no sign in");
                     break;
 
                 case FetchStatus.Unauthorized:
                     SetStatus(DotStale, _lastSuccess is null
-                        ? "sign-in expired"
+                        ? "sign in expired"
                         : $"stale · updated {_lastSuccess:HH:mm}");
                     if (_rows.Count == 0)
-                        ShowEmpty("Claude sign-in has expired. Open Claude Code once to refresh it.");
+                        ShowEmpty("Claude sign in expired and could not be refreshed automatically. Open Claude Code once to fix it.");
                     break;
 
                 default: // NetworkError

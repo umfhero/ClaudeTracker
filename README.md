@@ -29,13 +29,15 @@ period at each of those thresholds.
 
 ## How it works
 
-* Reads Claude Code's local OAuth token from `%USERPROFILE%\.claude\.credentials.json`
-  (**read only**: Claude Code owns the token and refreshes it itself).
+* Reads Claude Code's local OAuth token from `%USERPROFILE%\.claude\.credentials.json`.
 * Polls `https://api.anthropic.com/api/oauth/usage` every 5 minutes, plus once on
   waking from sleep. No scraping or manual logging.
-* If anything goes wrong it degrades gracefully: it keeps the last data and shows
-  `stale` when the sign in has expired, `offline` when there is no network, or a hint
-  if Claude Code has never signed in on the PC.
+* If the saved sign in has expired, the widget renews it itself with the same refresh
+  grant Claude Code uses and saves the new token back for Claude Code, so it loads with
+  live data straight from PC startup without Claude Code ever being opened.
+* If anything else goes wrong it degrades gracefully: it keeps the last data and shows
+  `stale` or `offline` in the footer, or a hint if Claude Code has never signed in on
+  the PC.
 
 ## The sticky note trick
 
