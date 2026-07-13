@@ -5,6 +5,7 @@ reset countdowns, pinned beneath every other window like a sticky note.
 
 * Reads your limits automatically from the local Claude Code sign in, no manual tracking
 * Renews an expired sign in by itself, so it loads with live data straight from PC startup
+* Optional daily project idea at the bottom of the widget, powered by your own free Gemini API key and fetched once per day
 * Sticks to the desktop layer, so apps always sit on top of it
 * Dark and light themes with a coral accent, draggable and lockable
 * Toast notifications at 80% and 95% of any limit

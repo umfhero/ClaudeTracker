@@ -11,6 +11,10 @@ public sealed class WidgetSettings
     public int PollMinutes { get; set; } = 5;
     public bool NotificationsEnabled { get; set; } = true;
     public string Theme { get; set; } = "dark";
+    public string? GeminiApiKey { get; set; }
+    public string GeminiModel { get; set; } = "gemini-2.5-flash";
+    public string? LastIdeaDate { get; set; }
+    public string? LastIdeaText { get; set; }
 }
 
 public static class SettingsService

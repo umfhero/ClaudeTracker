@@ -54,10 +54,21 @@ steals focus, and quietly restores itself if Show Desktop minimises it.
   * Lock position
   * Notifications
   * Light theme
+  * Gemini API key
   * Start with Windows
   * Exit
 
 Settings are stored in `%APPDATA%\UsageWidget\settings.json`.
+
+## Daily project idea (optional)
+
+Add a free Gemini API key (right click the widget, then Gemini API key) and the widget
+shows one short project idea at the bottom each day, phrased as a little spark like
+"What if we could make something that finds duplicate photos". The API is called once
+per day at most, so a free key never gets tired, and the day's idea is cached locally.
+Without a key the widget stays exactly as compact as before. If the API call fails, the
+widget shows a small grey API error note in the footer and nothing else. Get a key at
+[aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
 ## Requirements
 

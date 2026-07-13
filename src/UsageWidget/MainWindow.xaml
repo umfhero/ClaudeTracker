@@ -40,6 +40,7 @@
                 <MenuItem x:Name="LockMenuItem" Header="Lock position" IsCheckable="True" Click="Lock_Click"/>
                 <MenuItem x:Name="NotifyMenuItem" Header="Notifications" IsCheckable="True" Click="Notify_Click"/>
                 <MenuItem x:Name="ThemeMenuItem" Header="Light theme" IsCheckable="True" Click="Theme_Click"/>
+                <MenuItem Header="Gemini API key" Click="GeminiKey_Click"/>
                 <MenuItem x:Name="StartupMenuItem" Header="Start with Windows" IsCheckable="True" Click="Startup_Click"/>
                 <Separator/>
                 <MenuItem Header="Exit" Click="Exit_Click"/>
@@ -90,13 +91,26 @@
             <TextBlock x:Name="EmptyText" FontSize="11" Foreground="{DynamicResource InkSecondary}"
                        TextWrapping="Wrap" Margin="0,0,0,10" Visibility="Collapsed"/>
 
-            <!-- Footer status -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Ellipse x:Name="StatusDot" Width="6" Height="6" Fill="#898781"
-                         VerticalAlignment="Center" Margin="0,1,5,0"/>
-                <TextBlock x:Name="StatusText" Text="loading…" FontSize="10"
-                           Foreground="{DynamicResource InkMuted}"/>
+            <!-- Daily idea (only present when a Gemini key is set) -->
+            <StackPanel x:Name="IdeaSection" Visibility="Collapsed">
+                <Rectangle Height="1" Fill="{DynamicResource Track}" Margin="0,2,0,0"/>
+                <TextBlock x:Name="IdeaText" FontSize="11" LineHeight="16"
+                           Foreground="{DynamicResource InkSecondary}" TextWrapping="Wrap"
+                           Margin="0,10,0,14"/>
             </StackPanel>
+
+            <!-- Footer status -->
+            <Grid>
+                <TextBlock x:Name="ApiErrorText" Text="API error" FontSize="10"
+                           Foreground="{DynamicResource InkMuted}" HorizontalAlignment="Left"
+                           Visibility="Collapsed"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Ellipse x:Name="StatusDot" Width="6" Height="6" Fill="#898781"
+                             VerticalAlignment="Center" Margin="0,1,5,0"/>
+                    <TextBlock x:Name="StatusText" Text="loading…" FontSize="10"
+                               Foreground="{DynamicResource InkMuted}"/>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </Border>
 </Window>

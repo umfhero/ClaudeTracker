@@ -29,6 +29,8 @@ public partial class MainWindow : Window
     private UsageSnapshot? _lastSnapshot;
     private string? _lastPlan;
     private bool _refreshing;
+    private DateTimeOffset _lastIdeaAttempt = DateTimeOffset.MinValue;
+    private bool _ideaBusy;
 
     public MainWindow()
     {
@@ -147,6 +149,59 @@ public partial class MainWindow : Window
         {
             _refreshing = false;
         }
+        await UpdateIdeaAsync();
+    }
+
+    /// <summary>
+    /// Shows the daily project idea. The Gemini API is called at most once per day;
+    /// the result is cached in settings. Errors back off for an hour and surface only
+    /// as a small "API error" note in the footer.
+    /// </summary>
+    private async Task UpdateIdeaAsync(bool force = false)
+    {
+        string? key = _settings.GeminiApiKey;
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            IdeaSection.Visibility = Visibility.Collapsed;
+            ApiErrorText.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        string today = DateTime.Now.ToString("yyyy-MM-dd");
+        if (!force && _settings.LastIdeaDate == today && !string.IsNullOrEmpty(_settings.LastIdeaText))
+        {
+            IdeaText.Text = _settings.LastIdeaText;
+            IdeaSection.Visibility = Visibility.Visible;
+            ApiErrorText.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        if (_ideaBusy) return;
+        if (!force && DateTimeOffset.Now - _lastIdeaAttempt < TimeSpan.FromHours(1)) return;
+        _ideaBusy = true;
+        _lastIdeaAttempt = DateTimeOffset.Now;
+        try
+        {
+            var result = await GeminiIdeaProvider.GenerateAsync(key, _settings.GeminiModel);
+            if (result.Ok && result.Idea is not null)
+            {
+                _settings.LastIdeaDate = today;
+                _settings.LastIdeaText = result.Idea;
+                SettingsService.Save(_settings);
+                IdeaText.Text = result.Idea;
+                IdeaSection.Visibility = Visibility.Visible;
+                ApiErrorText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                IdeaSection.Visibility = Visibility.Collapsed;
+                ApiErrorText.Visibility = Visibility.Visible;
+            }
+        }
+        finally
+        {
+            _ideaBusy = false;
+        }
     }
 
     private void ApplySnapshot(UsageSnapshot snapshot, string? plan)
@@ -240,6 +295,17 @@ public partial class MainWindow : Window
 
     private void Startup_Click(object sender, RoutedEventArgs e) =>
         StartupService.SetEnabled(StartupMenuItem.IsChecked);
+
+    private async void GeminiKey_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new SettingsWindow(_settings.GeminiApiKey);
+        if (dialog.ShowDialog() == true)
+        {
+            _settings.GeminiApiKey = dialog.ApiKey;
+            SettingsService.Save(_settings);
+            await UpdateIdeaAsync(force: true);
+        }
+    }
 
     private void Exit_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
