@@ -185,6 +185,7 @@ public partial class MainWindow : Window
             var result = await GeminiIdeaProvider.GenerateAsync(key, _settings.GeminiModel);
             if (result.Ok && result.Idea is not null)
             {
+                if (result.ModelUsed is not null) _settings.GeminiModel = result.ModelUsed;
                 _settings.LastIdeaDate = today;
                 _settings.LastIdeaText = result.Idea;
                 SettingsService.Save(_settings);

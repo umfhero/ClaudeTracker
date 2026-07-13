@@ -5,17 +5,48 @@ using System.Text.RegularExpressions;
 
 namespace UsageWidget.Services;
 
-public sealed record IdeaResult(bool Ok, string? Idea, string? Error);
+public sealed record IdeaResult(bool Ok, string? Idea, string? Error, string? ModelUsed = null);
 
 /// <summary>
 /// Generates one short project idea via the Gemini API. Called at most once per day
 /// (the caller caches the result in settings) so a free tier key is never tired out.
+/// If the configured model has been retired (HTTP 404) it walks a fallback list,
+/// starting with the gemini-flash-latest alias, and reports which model worked so the
+/// caller can persist it.
 /// </summary>
 public static class GeminiIdeaProvider
 {
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(30) };
 
-    public static async Task<IdeaResult> GenerateAsync(string apiKey, string model)
+    private static readonly string[] FallbackModels =
+    {
+        "gemini-flash-latest",
+        "gemini-3.5-flash",
+        "gemini-3-flash-preview",
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+    };
+
+    public static async Task<IdeaResult> GenerateAsync(string apiKey, string preferredModel)
+    {
+        var tried = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var models = new List<string>();
+        if (!string.IsNullOrWhiteSpace(preferredModel)) models.Add(preferredModel);
+        models.AddRange(FallbackModels);
+
+        foreach (string model in models)
+        {
+            if (!tried.Add(model)) continue;
+            var (statusCode, result) = await TryModelAsync(apiKey, model);
+            if (result.Ok) return result;
+            // 404 means this model is gone or gated for this key; try the next one.
+            // Anything else (bad key, quota, network) won't improve with another model.
+            if (statusCode != 404) return result;
+        }
+        return new(false, null, "no available model");
+    }
+
+    private static async Task<(int StatusCode, IdeaResult Result)> TryModelAsync(string apiKey, string model)
     {
         try
         {
@@ -34,12 +65,8 @@ public static class GeminiIdeaProvider
             var body = new
             {
                 contents = new[] { new { parts = new[] { new { text = prompt } } } },
-                generationConfig = new
-                {
-                    temperature = 1.3,
-                    maxOutputTokens = 128,
-                    thinkingConfig = new { thinkingBudget = 0 },
-                },
+                // Roomy token cap so models that think before answering still finish.
+                generationConfig = new { temperature = 1.3, maxOutputTokens = 1024 },
             };
 
             string url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent";
@@ -51,8 +78,9 @@ public static class GeminiIdeaProvider
 
             using var response = await Http.SendAsync(request);
             string json = await response.Content.ReadAsStringAsync();
+            int status = (int)response.StatusCode;
             if (!response.IsSuccessStatusCode)
-                return new(false, null, $"HTTP {(int)response.StatusCode}");
+                return (status, new(false, null, $"HTTP {status}"));
 
             using var doc = JsonDocument.Parse(json);
             var text = new StringBuilder();
@@ -68,11 +96,13 @@ public static class GeminiIdeaProvider
             }
 
             string idea = Sanitise(text.ToString());
-            return idea.Length > 0 ? new(true, idea, null) : new(false, null, "empty response");
+            return idea.Length > 0
+                ? (status, new(true, idea, null, model))
+                : (status, new(false, null, "empty response"));
         }
         catch (Exception ex)
         {
-            return new(false, null, ex.Message);
+            return (-1, new IdeaResult(false, null, ex.Message));
         }
     }
 
